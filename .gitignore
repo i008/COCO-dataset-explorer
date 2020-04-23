@@ -55,7 +55,7 @@ dev.db
 .pytest_cache/
 
 .DS_Store
-
+./tmpfile.png
 ./docker-compose-secret.yml
 ./Notes
 ./tmpfile.png
