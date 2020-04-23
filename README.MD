@@ -2,11 +2,11 @@
 
 ### download (extract) the labels, annotations and images:
 
-images: 
+images:  
 http://images.cocodataset.org/zips/val2017.zip
-predictions file: 
+predictions file:   
 https://i008data.s3.eu-central-1.amazonaws.com/coco_val_results_maskrcnn50.json.segm.json
-labels:
+labels:  
 https://i008data.s3.eu-central-1.amazonaws.com/instances_val2017.json
 
 ### run 
