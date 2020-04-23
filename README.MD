@@ -3,7 +3,7 @@
 ### download (extract) the labels, annotations and images:
 
 images:  
-http://images.cocodataset.org/zips/val2017.zip
+http://images.cocodataset.org/zips/val2017.zip  
 predictions file:     
 https://i008data.s3.eu-central-1.amazonaws.com/coco_val_results_maskrcnn50.json.segm.json  
 labels:    
