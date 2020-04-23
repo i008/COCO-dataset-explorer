@@ -17,7 +17,7 @@ def get_inspector(coco_train, coco_predictions, images_path):
 
 
 def app(args):
-    st.title('COCO Inspector')
+    st.title('COCO Explorer')
     topbox = st.sidebar.selectbox("Choose what to do ", ['inspect predictions visually',
                                                          'inspect image statistics',
                                                          'inspect annotations',
@@ -145,7 +145,6 @@ def app(args):
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--coco_train", type=str, default=None)
     parser.add_argument("--coco_predictions", type=str, default=None)
