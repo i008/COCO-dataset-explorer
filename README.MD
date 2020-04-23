@@ -4,15 +4,10 @@
 
 images: 
 http://images.cocodataset.org/zips/val2017.zip
-
 predictions file: 
 https://i008data.s3.eu-central-1.amazonaws.com/coco_val_results_maskrcnn50.json.segm.json
-
 labels:
 https://i008data.s3.eu-central-1.amazonaws.com/instances_val2017.json
-
-### change the config.py so it points to the files.
-
 
 ### run 
 ```bash
