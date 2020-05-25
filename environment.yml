@@ -1,0 +1,15 @@
+name: cocoexplorer
+dependencies:
+  - cython
+  - numpy==1.16.2
+  - pip
+  - pip:
+      - albumentations==0.4.5
+      - opencv_python==4.2.0.32
+      - plotly==4.5.2
+      - pandas==0.24.2
+      - streamlit==0.57.0
+      - matplotlib==3.1.1
+      - Pillow==7.1.1
+      - git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
+      - easyimages==1.1

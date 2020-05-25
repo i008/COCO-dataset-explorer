@@ -5,6 +5,8 @@ from collections import defaultdict
 from pycocotools import mask as maskUtils
 import copy
 
+from torchvision.models.detection import faster_rcnn
+
 
 class COCOeval:
     # Interface for evaluating detection on the Microsoft COCO dataset.

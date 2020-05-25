@@ -9,26 +9,28 @@ and calculate important metrics.
 You can use the predictions i prepared and explore the results on the coco validation dataset
 the predictions are coming from a Mask RCNN model trained with mmdetection.
 
-1. download (extract) the labels, annotations and images:
+1. download (and extract) the labels, annotations and images:
 
-images:  
-http://images.cocodataset.org/zips/val2017.zip  
-predictions file:     
-https://i008data.s3.eu-central-1.amazonaws.com/coco_val_results_maskrcnn50.json.segm.json  
-labels:    
-https://i008data.s3.eu-central-1.amazonaws.com/instances_val2017.json  
+https://drive.google.com/open?id=1a0kNT_UXhU7FzljmIdQIBECRCUMy4PPs
 
-2. run 
+2. setup using docker
 ```bash
-streamlit run  coco_explorer.py -- --coco_train /Users/jcieslik/Downloads/annotations/instances_val2017.json --coco_predictions /Users/jcieslik/coco_val_results_maskrcnn50.json.segm.json  --images_path /Users/jcieslik/Downloads/val2017/
+sudo docker run -p 8501:8501 -it -v {path_to_downloaded_folder from point 1.}/coco_results:/coco_results i008/coco_explorer streamlit run  coco_explorer.py -- --coco_train /coco_results/instances_val2017.json --coco_predictions /coco_results/coco_val_results_maskrcnn50.json.segm.json  --images_path /coco_results/val2017/
 ```
 
+2. setup using conda
+```bash
+conda env update
+conda activate cocoexplorer
+streamlit run coco_explorer.py -- --coco_train /Users/jcieslik/Downloads/annotations/instances_val2017.json --coco_predictions /Users/jcieslik/coco_val_results_maskrcnn50.json.segm.json  --images_path /Users/jcieslik/Downloads/val2017/
+```
+3.
+go to localhost:8501
 
 
 ### Running on your own data
 
 In the same way you can explore your own results. Just follow the official COCO dataset format for annotations and predictions.
-
 
 
 ### Examples

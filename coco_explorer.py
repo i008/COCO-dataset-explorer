@@ -1,8 +1,10 @@
+import argparse
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 from pycocotools.coco import COCO
-import argparse
+
 from cocoinspector import CoCoInspector
 
 
@@ -104,7 +106,6 @@ def app(args):
 
                 st.pyplot(f[0])
 
-
     elif topbox == 'inspect image statistics':
         st.plotly_chart(px.histogram(inspector.images_df, x='aspect_ratio', title='aspect ratio distribiution',
                                      hover_name=inspector.images_df.file_name))
@@ -127,7 +128,6 @@ def app(args):
             px.bar(dfarea, x='category_name', y='area', title='avg object size(area) per class'))
 
         st.plotly_chart(px.histogram(inspector.annot_df, x='ann_ar', title="Bounding box aspect ratio distribiution"))
-
 
     elif topbox == 'CoCo scores':
         st.subheader("Shows per class mAP scores as calculated by pycocotools")
