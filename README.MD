@@ -11,18 +11,22 @@ the predictions are coming from a Mask RCNN model trained with mmdetection.
 
 1. download (and extract) the labels, annotations and images:
 
-https://drive.google.com/open?id=1a0kNT_UXhU7FzljmIdQIBECRCUMy4PPs
+https://drive.google.com/open?id=1wxIagenNdCt_qphEe8gZYK7H2_to9QXl
+
 
 2. setup using docker
 ```bash
-sudo docker run -p 8501:8501 -it -v {path_to_downloaded_folder from point 1.}/coco_results:/coco_results i008/coco_explorer streamlit run  coco_explorer.py -- --coco_train /coco_results/instances_val2017.json --coco_predictions /coco_results/coco_val_results_maskrcnn50.json.segm.json  --images_path /coco_results/val2017/
-```
+sudo docker run -p 8501:8501 -it -v "$(pwd)"/coco_data:/coco_data i008/coco_explorer  \
+    streamlit run  coco_explorer.py -- \
+    --coco_train /coco_data/ground_truth_annotations.json \
+    --coco_predictions /coco_data/predictions.json  \
+    --images_path /coco_data/images/```
 
 2. setup using conda
 ```bash
 conda env update
 conda activate cocoexplorer
-streamlit run coco_explorer.py -- --coco_train /Users/jcieslik/Downloads/annotations/instances_val2017.json --coco_predictions /Users/jcieslik/coco_val_results_maskrcnn50.json.segm.json  --images_path /Users/jcieslik/Downloads/val2017/
+streamlit run coco_explorer.py -- --coco_train ./coco_data/ground_truth_annotations.json --coco_predictions ./coco_data/predictions.json  --images_path ./coco_data/val2017/
 ```
 3.
 go to localhost:8501

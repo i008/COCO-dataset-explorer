@@ -60,3 +60,5 @@ dev.db
 ./Notes
 ./tmpfile.png
 ./playground.ipynb
+./coco_data
+./coco_data.tar
