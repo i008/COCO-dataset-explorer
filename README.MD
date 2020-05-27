@@ -9,27 +9,28 @@ and calculate important metrics.
 You can use the predictions i prepared and explore the results on the coco validation dataset
 the predictions are coming from a Mask RCNN model trained with mmdetection.
 
-1. download (and extract) the labels, annotations and images:
+1 - Download (and extract in project directory) the labels, annotations and images:
 
 https://drive.google.com/open?id=1wxIagenNdCt_qphEe8gZYK7H2_to9QXl
 
 
-2. setup using docker
+2 -  Setup using docker
+
 ```bash
 sudo docker run -p 8501:8501 -it -v "$(pwd)"/coco_data:/coco_data i008/coco_explorer  \
     streamlit run  coco_explorer.py -- \
     --coco_train /coco_data/ground_truth_annotations.json \
     --coco_predictions /coco_data/predictions.json  \
-    --images_path /coco_data/images/```
+    --images_path /coco_data/images/
+```
 
-2. setup using conda
+2 - Setup using conda
 ```bash
 conda env update
 conda activate cocoexplorer
 streamlit run coco_explorer.py -- --coco_train ./coco_data/ground_truth_annotations.json --coco_predictions ./coco_data/predictions.json  --images_path ./coco_data/val2017/
 ```
-3.
-go to localhost:8501
+3 - go to localhost:8501
 
 
 ### Running on your own data
