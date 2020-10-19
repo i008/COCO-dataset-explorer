@@ -76,7 +76,7 @@ def app(args):
                 random_ids = inspector.get_random_images_with_category(category)
                 for id in random_ids[:10]:
                     print(id)
-                    f = inspector.visualize_image(id,
+                    f, fn = inspector.visualize_image(id,
                                                   draw_gt_mask=draw_gt_mask,
                                                   draw_pred_mask=draw_pred_mask,
                                                   score_threshold=score,
@@ -96,7 +96,7 @@ def app(args):
             agg = agg[agg.precision.between(precision - 0.01, precision + 0.01)]
 
             for id in agg.index[:10]:
-                f = inspector.visualize_image(id,
+                f, fn = inspector.visualize_image(id,
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
                                               score_threshold=score,
