@@ -32,7 +32,7 @@ class CoCoInspector():
         self.base_path = base_path
         self.cat2id = dict([(v['name'], v['id']) for v in self.coco_dt.cats.values()])
 
-        self.threshold = 0.3 # default per image scoring threshold
+        self.threshold = 0.3  # default per image scoring threshold
 
     def evaluate(self):
         if self.coco_gt and self.coco_dt:
@@ -54,13 +54,12 @@ class CoCoInspector():
         self.images_df = df
 
         all_anns = self.coco_gt.loadAnns(self.coco_gt.getAnnIds())
-        dfannot = pd.DataFrame.from_records(all_anns)[['area', 'category_id','bbox']]
+        dfannot = pd.DataFrame.from_records(all_anns)[['area', 'category_id', 'bbox']]
 
         dfannot['ann_ar'] = dfannot.bbox.apply(lambda x: x[2] / x[3])
         dfannot['category_name'] = dfannot.category_id.apply(lambda x: self.coco_gt.cats[x]['name'])
 
         self.annot_df = dfannot
-
 
     def per_image_scores(self, threshold=0.3):
         new_r = []
@@ -91,10 +90,7 @@ class CoCoInspector():
 
     def ap_per_class(self):
         df = pd.DataFrame(self.cocoeval.per_class_precisions).T
-        c = ['AP@[IoU=0.50:0.95|area=all|maxDets=100]', 'AP@[IoU=0.50|area=all|maxDets=100]',
-             'AP@[IoU=0.75|area=all|maxDets=100]', 'AP@[IoU=0.50:0.95|area=small|maxDets=100]',
-             'AP@[IoU=0.50:0.95|area=medium|maxDets=100]', 'AP@[IoU=0.50:0.95|area=large|maxDets=100]']
-        df.columns = c
+        df.columns = self.cocoeval.ap_per_class_columns
         return df
 
     @property
@@ -124,11 +120,15 @@ class CoCoInspector():
 
     def get_detection_matches(self, image_id):
         try:
-            gtmatches = np.concatenate([a['gtMatches'].ravel() for a in [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
+            gtmatches = np.concatenate([a['gtMatches'].ravel() for a in
+                                        [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(
+                int)
         except ValueError:
             gtmatches = []
         try:
-            dtmatches = np.concatenate([a['dtMatches'].ravel() for a in [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
+            dtmatches = np.concatenate([a['dtMatches'].ravel() for a in
+                                        [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(
+                int)
         except ValueError:
             dtmatches = []
         return list(set(gtmatches)), list(set(dtmatches))
@@ -174,7 +174,6 @@ class CoCoInspector():
                       figsize=figsize,
                       fontsize=fontsize,
                       draw_pred_mask=draw_pred_mask)
-
 
         fig1 = plt.gcf()
         # plt.show()

@@ -434,8 +434,10 @@ class COCOeval:
         '''
 
         self.per_class_precisions = []
+        self.ap_per_class_columns = []
 
         def _summarize(ap=1, iouThr=None, areaRng='all', maxDets=100):
+            print(ap, iouThr, areaRng, maxDets)
             p = self.params
             iStr = ' {:<18} {} @[ IoU={:<9} | area={:>6s} | maxDets={:>3d} ] = {:0.3f}'
             titleStr = 'Average Precision' if ap == 1 else 'Average Recall'
@@ -471,10 +473,11 @@ class COCOeval:
                 if ap == 1:
                     pcp = {}
                     for i, c in enumerate(sorted(list(self.cocoDt.cats.values()), key=lambda x: x['id'])):
-                        #                         print('category : {0} : {1}'.format(i,np.mean(s[:,:,i,:])))
                         pcp[c['name']] = np.mean(s[:, :, i, :])
 
                     self.per_class_precisions.append(pcp)
+                    self.ap_per_class_columns.append(f"ap={ap} iouThr={iouThr or '0.5:0.95'} area={areaRng} maxDets={maxDets}")
+
 
             print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))
             return mean_s
