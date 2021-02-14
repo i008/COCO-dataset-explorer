@@ -123,10 +123,14 @@ class CoCoInspector():
         return self.base_path + self._imageid2name(image_id)
 
     def get_detection_matches(self, image_id):
-        gtmatches = np.concatenate([a['gtMatches'].ravel() for a in
-                                    [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
-        dtmatches = np.concatenate([a['dtMatches'].ravel() for a in
-                                    [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
+        try:
+            gtmatches = np.concatenate([a['gtMatches'].ravel() for a in [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
+        except ValueError:
+            gtmatches = []
+        try:
+            dtmatches = np.concatenate([a['dtMatches'].ravel() for a in [c for c in self.cocoeval.evalImgs if c and c['image_id'] == image_id]]).astype(int)
+        except ValueError:
+            dtmatches = []
         return list(set(gtmatches)), list(set(dtmatches))
 
     def organize_annotations(self, all_annotations, gtmatches):

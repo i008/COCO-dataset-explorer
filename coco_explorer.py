@@ -56,6 +56,7 @@ def app(args):
 
         if r == 'image_id':
             r = st.slider('slider trough all images', min_value=0, max_value=len(inspector.image_ids))
+            st.text(inspector._imageid2path(inspector.image_ids[r]))
             f, fn = inspector.visualize_image(inspector.image_ids[r],
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
@@ -77,12 +78,12 @@ def app(args):
                 for id in random_ids[:10]:
                     print(id)
                     f, fn = inspector.visualize_image(id,
-                                                  draw_gt_mask=draw_gt_mask,
-                                                  draw_pred_mask=draw_pred_mask,
-                                                  score_threshold=score,
-                                                  show_only=[vis_options[o] for o in ms],
-                                                  fontsize=30,
-                                                  figsize=(20, 20))
+                                                      draw_gt_mask=draw_gt_mask,
+                                                      draw_pred_mask=draw_pred_mask,
+                                                      score_threshold=score,
+                                                      show_only=[vis_options[o] for o in ms],
+                                                      fontsize=30,
+                                                      figsize=(20, 20))
 
                     st.pyplot(f[0])
 
@@ -97,12 +98,12 @@ def app(args):
 
             for id in agg.index[:10]:
                 f, fn = inspector.visualize_image(id,
-                                              draw_gt_mask=draw_gt_mask,
-                                              draw_pred_mask=draw_pred_mask,
-                                              score_threshold=score,
-                                              show_only=[vis_options[o] for o in ms],
-                                              fontsize=30,
-                                              figsize=(20, 20))
+                                                  draw_gt_mask=draw_gt_mask,
+                                                  draw_pred_mask=draw_pred_mask,
+                                                  score_threshold=score,
+                                                  show_only=[vis_options[o] for o in ms],
+                                                  fontsize=30,
+                                                  figsize=(20, 20))
 
                 st.pyplot(f[0])
 
