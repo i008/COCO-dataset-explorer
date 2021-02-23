@@ -28,7 +28,17 @@ conda env update
 conda activate cocoexplorer
 streamlit run coco_explorer.py -- --coco_train ./coco_data/ground_truth_annotations.json --coco_predictions ./coco_data/predictions.json  --images_path ./coco_data/val2017/
 ```
-3 - go to localhost:8501
+
+2. Setup using pip
+
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt
+streamlit run coco_explorer.py -- --coco_train ./coco_data/ground_truth_annotations.json --coco_predictions ./coco_data/predictions.json  --images_path ./coco_data/val2017/
+```
+
+3. go to http://localhost:8501
 
 
 ### Running on your own data
