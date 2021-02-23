@@ -56,8 +56,18 @@ def app(args):
         r = st.sidebar.radio('Inspect by', options=['image_id', 'category', 'precision'])
 
         if r == 'image_id':
-            r = st.slider('slider trough all images', min_value=0, max_value=len(inspector.image_ids))
-            st.text(inspector._imageid2path(inspector.image_ids[r]))
+            r = st.text_input('select image by path:',)
+            if r:
+                r = inspector._path2imageid(r)
+                if r < 0:
+                    st.error('No such image file_name')
+                    r = 0
+            else:
+                r = 0
+            r = st.slider('slider trough all images', value=r, min_value=0, max_value=len(inspector.image_ids))
+            path = inspector._imageid2path(inspector.image_ids[r])
+            st.text(path)
+            print(path)
             f, fn = inspector.visualize_image(inspector.image_ids[r],
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,

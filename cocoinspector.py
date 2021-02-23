@@ -112,6 +112,12 @@ class CoCoInspector():
         annotations = coco.loadAnns(coco.getAnnIds(imgIds=image_id, catIds=cat_ids))
         return annotations
 
+    def _path2imageid(self, path):
+        if path.startswith(self.base_path):
+            path = path[len(self.base_path):]
+        return next((image_id for image_id, img in self.coco_gt.imgs.items()
+                     if img['file_name'] == path), -1)
+    
     def _imageid2name(self, image_id):
         return self.coco_gt.loadImgs(ids=[image_id])[0]['file_name']
 
