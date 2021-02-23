@@ -62,7 +62,6 @@ def vis_image(img,
     ax.imshow(img)
 
     for i, ann in enumerate(annotations[:]):
-        caption = []
         if ann['type'] not in show_only or ann.get('score', 1) < score_threshold:
             continue
 
@@ -79,32 +78,30 @@ def vis_image(img,
             'tp': 'orange'
         }
 
+        caption = []
+        rectargs = {'fill': False,
+                    'edgecolor': type2color[ann_type],
+                    'linewidth': max(1, fontsize//10),
+                    'linestyle': '-'}
         if ann_type == 'gt':
-            ax.add_patch(
-                plt.Rectangle((x, y), w, h, fill=False, edgecolor=type2color[ann_type], linewidth=3, linestyle='-'))
             caption.append(label)
-        elif ann_type == 'pred':
-            ax.add_patch(
-                plt.Rectangle((x, y), w, h, fill=False, edgecolor=type2color[ann_type], linewidth=3, linestyle='-'))
-            caption.append(label)
-            caption.append('{:.2f}'.format(score))
         elif ann_type == 'fp':
-            ax.add_patch(
-                plt.Rectangle((x, y), w, h, fill=False, edgecolor=type2color[ann_type], linewidth=3, linestyle='--'))
+            rectargs['linestyle'] = '--'
             caption.append(label)
             caption.append('{:.2f}'.format(score))
         elif ann_type == 'tp':
-            ax.add_patch(
-                plt.Rectangle((x, y), w, h, fill=False, edgecolor=type2color[ann_type], linewidth=5, linestyle='-'))
+            rectargs['linewidth'] = max(1, fontsize//8)
             caption.append(label)
             caption.append('{:.2f}'.format(score))
 
+        ax.add_patch(plt.Rectangle((x, y), w, h, **rectargs))
         if len(caption) > 0:
             ax.text(x - 10, y - 10,
                     ': '.join(caption),
                     style='italic',
                     size=fontsize,
-                    bbox={'facecolor': type2color[ann_type], 'alpha': 0.3, 'pad': 2})
+                    bbox={'facecolor': type2color[ann_type], 'alpha': 0.3,
+                          'pad': max(1, fontsize//15)})
 
     # Show
     if axis_off:

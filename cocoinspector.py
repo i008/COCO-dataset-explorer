@@ -143,14 +143,14 @@ class CoCoInspector():
         collect = []
         for a in all_annotations:
             a['label'] = self.coco_gt.cats[a['category_id']]['name']
-            if 'score' not in a and a['id']:
+            if 'score' not in a:
                 a['type'] = 'gt'
                 collect.append(a)
                 continue
-            if 'score' in a: a['type'] = 'pred'
-            if a['id'] in gtmatches: a['type'] = 'tp'
-            if a['id'] not in gtmatches: a['type'] = 'fp'
-
+            if a['id'] in gtmatches:
+                a['type'] = 'tp'
+            else:
+                a['type'] = 'fp'
             collect.append(a)
         return collect
 
@@ -191,6 +191,8 @@ class CoCoInspector():
         # plt.show()
         plt.draw()
         fn = 'tmpfile.png'
+        # savefig + st.image can be faster than st.pyplot,
+        # but only when using small dpi/resolution
         #fig1.savefig(fn, dpi=dpi)
 
         return f, fn

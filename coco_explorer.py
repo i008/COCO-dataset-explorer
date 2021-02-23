@@ -49,6 +49,7 @@ def app(args):
                                     )
 
         st.sidebar.subheader('Visual settings')
+        size = st.sidebar.slider('plot resolution', min_value=1, max_value=50, value=30)
         score = st.sidebar.slider('score threshold', min_value=0.0, max_value=1.0, value=0.5)
 
         draw_pred_mask = st.sidebar.checkbox("Draw predictions masks (red)")
@@ -73,9 +74,9 @@ def app(args):
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
                                               score_threshold=score,
-                                              fontsize=33,
+                                              fontsize=size,
                                               show_only=[vis_options[o] for o in ms],
-                                              figsize=(15, 15))
+                                              figsize=(size, size))
             st.pyplot(f[0])
             imscores = inspector.image_scores_agg
             if inspector.image_ids[r] in imscores.index:
@@ -96,8 +97,8 @@ def app(args):
                                                       only_categories=[category] if exclusive else [],
                                                       score_threshold=score,
                                                       show_only=[vis_options[o] for o in ms],
-                                                      fontsize=30,
-                                                      figsize=(20, 20))
+                                                      fontsize=size,
+                                                      figsize=(size, size))
 
                     st.pyplot(f[0])
 
@@ -116,8 +117,8 @@ def app(args):
                                                   draw_pred_mask=draw_pred_mask,
                                                   score_threshold=score,
                                                   show_only=[vis_options[o] for o in ms],
-                                                  fontsize=30,
-                                                  figsize=(20, 20))
+                                                  fontsize=size,
+                                                  figsize=(size, size))
 
                 st.pyplot(f[0])
 
