@@ -64,8 +64,7 @@ def app(args):
                                               fontsize=33,
                                               show_only=[vis_options[o] for o in ms],
                                               figsize=(15, 15))
-
-            st.image(fn, use_column_width=True)
+            st.pyplot(f[0])
             imscores = inspector.image_scores_agg
             if inspector.image_ids[r] in imscores.index:
                 st.dataframe(imscores.loc[inspector.image_ids[r]])

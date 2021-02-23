@@ -179,6 +179,6 @@ class CoCoInspector():
         # plt.show()
         plt.draw()
         fn = 'tmpfile.png'
-        fig1.savefig(fn, dpi=dpi)
+        #fig1.savefig(fn, dpi=dpi)
 
         return f, fn
