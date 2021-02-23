@@ -39,7 +39,7 @@ def vis_image(img,
         np.random.seed(42)
         color_masks = [
             np.random.randint(0, 256, (1, 3), dtype=np.uint8)
-            for _ in range(max([c['category_id'] for c in annotations]) + 1)
+            for _ in range(max([c['category_id'] for c in annotations], default=0) + 1)
         ]
 
         for i, ann in enumerate(annotations[:]):
