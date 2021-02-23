@@ -73,6 +73,7 @@ def app(args):
         if r == 'category':
             category = st.sidebar.selectbox(label='select by category',
                                             options=[c['name'] for c in inspector.categories])
+            exclusive = st.sidebar.checkbox(label='Show only this category')
             print(category)
             if category:
                 random_ids = inspector.get_random_images_with_category(category)
@@ -81,6 +82,7 @@ def app(args):
                     f, fn = inspector.visualize_image(id,
                                                       draw_gt_mask=draw_gt_mask,
                                                       draw_pred_mask=draw_pred_mask,
+                                                      only_categories=[category] if exclusive else [],
                                                       score_threshold=score,
                                                       show_only=[vis_options[o] for o in ms],
                                                       fontsize=30,

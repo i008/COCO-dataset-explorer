@@ -108,8 +108,8 @@ class CoCoInspector():
         return sorted(categories, key=lambda x: x['id'])
 
     @staticmethod
-    def _get_detections(coco, image_id):
-        annotations = coco.loadAnns(coco.getAnnIds(imgIds=image_id))
+    def _get_detections(coco, image_id, cat_ids=[]):
+        annotations = coco.loadAnns(coco.getAnnIds(imgIds=image_id, catIds=cat_ids))
         return annotations
 
     def _imageid2name(self, image_id):
@@ -153,13 +153,16 @@ class CoCoInspector():
                         score_threshold=0.1,
                         draw_gt_mask=True,
                         draw_pred_mask=True,
-                        fontsize=20,
+                        only_categories=None,
+                        fontsize=12,
                         figsize=(10, 10),
                         dpi=200,
                         ):
-        annotations = self._get_detections(self.coco_gt, image_id)
+        annotations = self._get_detections(self.coco_gt, image_id,
+                                           cat_ids=[self.cat2id[cat] for cat in only_categories or []])
         if self.coco_dt:
-            dt_annotations = self._get_detections(self.coco_dt, image_id)
+            dt_annotations = self._get_detections(self.coco_dt, image_id,
+                                                  cat_ids=[self.cat2id[cat] for cat in only_categories or []])
             gtmatches, dtmatches = self.get_detection_matches(image_id)
             annotations = annotations + dt_annotations
             annotations = self.organize_annotations(annotations, gtmatches)
