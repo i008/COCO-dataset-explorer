@@ -19,6 +19,7 @@ def get_inspector(coco_train, coco_predictions, images_path):
 
 
 def app(args):
+    st.set_page_config(layout='wide')
     st.title('COCO Explorer')
     topbox = st.sidebar.selectbox("Choose what to do ", ['inspect predictions visually',
                                                          'inspect image statistics',
