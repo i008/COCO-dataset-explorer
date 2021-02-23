@@ -165,6 +165,9 @@ class CoCoInspector():
             annotations = self.organize_annotations(annotations, gtmatches)
 
         image = Image.open(self._imageid2path(image_id))
+        # cannot work with 16/32 bit or float images due to Pillow#3011 Pillow#3159 Pillow#3838
+        assert not image.mode.startswith(('I', 'F')), "image %d has unsupported color mode" % image_i
+        image = image.convert('RGB')
         f = vis_image(image, annotations,
                       show_only=show_only,
                       score_threshold=score_threshold,
