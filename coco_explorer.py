@@ -67,7 +67,8 @@ def app(args):
 
             st.image(fn, use_column_width=True)
             imscores = inspector.image_scores_agg
-            st.dataframe(imscores.loc[inspector.image_ids[r]])
+            if inspector.image_ids[r] in imscores.index:
+                st.dataframe(imscores.loc[inspector.image_ids[r]])
 
         if r == 'category':
             category = st.sidebar.selectbox(label='select by category',
