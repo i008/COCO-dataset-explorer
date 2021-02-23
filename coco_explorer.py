@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas as pd
 import plotly.express as px
@@ -160,8 +161,13 @@ def app(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--coco_train", type=str, default=None)
-    parser.add_argument("--coco_predictions", type=str, default=None)
-    parser.add_argument("--images_path", type=str, default=None)
+    parser.add_argument("--coco_train", type=str, required=True, metavar="PATH/TO/COCO.json",
+                        help="COCO dataset to inspect")
+    parser.add_argument("--coco_predictions", type=str, required=True, metavar="PATH/TO/COCO.json",
+                        help="COCO annotations to compare to")
+    parser.add_argument("--images_path", type=str, default=os.getcwd(), metavar="PATH/TO/IMAGES/",
+                        help="Directory path to prepend to file_name paths in COCO")
     args = parser.parse_args()
+    if args.images_path[-1] != '/':
+        args.images_path += '/'
     app(args)
