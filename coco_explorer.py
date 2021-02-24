@@ -51,11 +51,12 @@ def app(args):
                                     )
 
         st.sidebar.subheader('Visual settings')
-        size = st.sidebar.slider('plot resolution', min_value=1, max_value=50, value=30)
+        size = st.sidebar.slider('plot resolution', min_value=1, max_value=50, value=15)
         score = st.sidebar.slider('score threshold', min_value=0.0, max_value=1.0, value=0.5)
 
         draw_pred_mask = st.sidebar.checkbox("Draw predictions masks (red)")
         draw_gt_mask = st.sidebar.checkbox("Draw ground truth masks (green)")
+        adjust_labels = st.sidebar.checkbox("Optimize label placement")
 
         r = st.sidebar.radio('Inspect by', options=['image_id', 'category', 'precision'])
 
@@ -75,6 +76,7 @@ def app(args):
             f, fn = inspector.visualize_image(inspector.image_ids[r],
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
+                                              adjust_labels=adjust_labels,
                                               score_threshold=score,
                                               fontsize=size,
                                               show_only=[vis_options[o] for o in ms],
