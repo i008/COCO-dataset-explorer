@@ -139,12 +139,15 @@ class CoCoInspector():
             dtmatches = []
         return list(set(gtmatches)), list(set(dtmatches))
 
-    def organize_annotations(self, all_annotations, gtmatches):
+    def organize_annotations(self, all_annotations, gtmatches, dtmatches):
         collect = []
         for a in all_annotations:
             a['label'] = self.coco_gt.cats[a['category_id']]['name']
             if 'score' not in a:
-                a['type'] = 'gt'
+                if a['id'] in dtmatches:
+                    a['type'] = 'gt'
+                else:
+                    a['type'] = 'fn'
                 collect.append(a)
                 continue
             if a['id'] in gtmatches:
@@ -171,7 +174,7 @@ class CoCoInspector():
                                                   cat_ids=[self.cat2id[cat] for cat in only_categories or []])
             gtmatches, dtmatches = self.get_detection_matches(image_id)
             annotations = annotations + dt_annotations
-            annotations = self.organize_annotations(annotations, gtmatches)
+            annotations = self.organize_annotations(annotations, gtmatches, dtmatches)
 
         image = Image.open(self._imageid2path(image_id))
         # cannot work with 16/32 bit or float images due to Pillow#3011 Pillow#3159 Pillow#3838

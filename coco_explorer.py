@@ -34,14 +34,16 @@ def app(args):
 
         vis_options = {'true positives': 'tp',
                        'ground truth': 'gt',
+                       'false negatives': 'fn',
                        'false positives': 'fp',
                        }
 
         st.sidebar.text("""
         What to show on image
-        TP - boxes matched with GT (orange)
-        FP - boxes that did not match with GT (teal)
-        GT - ground truth annotations (green)
+        TP - results matching GT (orange)
+        FP - results not matching GT (teal)
+        FN - GT not matching results (red)
+        GT - all ground truth (green)
         """)
         ms = st.sidebar.multiselect("",
                                     list(vis_options.keys()),

@@ -45,14 +45,14 @@ def vis_image(img,
         for i, ann in enumerate(annotations[:]):
             if ann['type'] in show_only:
                 if ann.get('score', 1) > score_threshold:
-                    if ann['type'] == 'gt' and not draw_gt_mask:
+                    if ann['type'] in ['gt', 'fn'] and not draw_gt_mask:
                         continue
-                    if ann['type'] != 'gt' and not draw_pred_mask:
+                    if ann['type'] not in ['gt', 'fn'] and not draw_pred_mask:
                         continue
 
-                    if ann['type'] == 'gt':
+                    if ann['type'] in ['gt', 'fn']:
                         color_mask = np.array((0, 255, 0))
-                    if ann['type'] != 'gt':
+                    if ann['type'] not in ['gt', 'fn']:
                         color_mask = np.array((255, 0, 0))
 
                     #                     color_mask = color_masks[ann['category_id']]
@@ -62,6 +62,8 @@ def vis_image(img,
     ax.imshow(img)
 
     for i, ann in enumerate(annotations[:]):
+        if ann['type'] == 'fn' and 'fn' not in show_only:
+            ann['type'] = 'gt'
         if ann['type'] not in show_only or ann.get('score', 1) < score_threshold:
             continue
 
@@ -73,7 +75,7 @@ def vis_image(img,
 
         type2color = {
             'gt': 'g',
-            'pred': 'r',
+            'fn': 'r',
             'fp': 'teal',
             'tp': 'orange'
         }
@@ -83,7 +85,7 @@ def vis_image(img,
                     'edgecolor': type2color[ann_type],
                     'linewidth': max(1, fontsize//10),
                     'linestyle': '-'}
-        if ann_type == 'gt':
+        if ann_type in ['gt', 'fn']:
             caption.append(label)
         elif ann_type == 'fp':
             rectargs['linestyle'] = '--'
