@@ -61,12 +61,14 @@ def app(args):
         r = st.sidebar.radio('Inspect by', options=['image_id', 'category', 'precision'])
 
         if r == 'image_id':
-            r = st.text_input('select image by path:',)
-            if r:
-                r = inspector._path2imageid(r)
+            path = st.text_input('select image by path:',)
+            if path:
+                r = inspector._path2imageid(path)
                 if r < 0:
                     st.error('No such image file_name')
                     r = 0
+                else:
+                    r = inspector.image_ids.index(r)
             else:
                 r = 0
             r = st.slider('slider trough all images', value=r, min_value=0, max_value=len(inspector.image_ids))
