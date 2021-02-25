@@ -10,10 +10,11 @@ from cocoinspector import CoCoInspector
 
 
 @st.cache(allow_output_mutation=True)
-def get_inspector(coco_train, coco_predictions, images_path):
+def get_inspector(coco_train, coco_predictions, images_path, eval_type, iou_min, iou_max):
     coco = COCO(coco_train)
     coco_dt = coco.loadRes(coco_predictions)
-    inspector = CoCoInspector(coco, coco_dt, base_path=images_path)
+    inspector = CoCoInspector(coco, coco_dt, base_path=images_path,
+                              iou_type=eval_type, iou_min=iou_min, iou_max=iou_max)
     inspector.evaluate()
     inspector.calculate_stats()
     return inspector
@@ -22,12 +23,15 @@ def get_inspector(coco_train, coco_predictions, images_path):
 def app(args):
     st.set_page_config(layout='wide')
     st.title('COCO Explorer')
+    ioumin = st.sidebar.slider("Minimum IoU", min_value=0.0, max_value=1.0, value=args.iou_min)
+    ioumax = st.sidebar.slider("Maximum IoU", min_value=0.0, max_value=1.0, value=args.iou_max)
     topbox = st.sidebar.selectbox("Choose what to do ", ['inspect predictions visually',
                                                          'inspect image statistics',
                                                          'inspect annotations',
                                                          'CoCo scores'
                                                          ])
-    inspector = get_inspector(args.coco_train, args.coco_predictions, args.images_path)
+    inspector = get_inspector(args.coco_train, args.coco_predictions, args.images_path,
+                              args.eval_type, ioumin, ioumax)
     if topbox == 'inspect predictions visually':
 
         st.sidebar.subheader('Inspect predictions')
@@ -176,6 +180,12 @@ if __name__ == '__main__':
                         help="COCO annotations to compare to")
     parser.add_argument("--images_path", type=str, default=os.getcwd(), metavar="PATH/TO/IMAGES/",
                         help="Directory path to prepend to file_name paths in COCO")
+    parser.add_argument("--eval_type", type=str, default="bbox", choices={"bbox", "segm", "keypoints"},
+                        help="Mode of comparison (where to look for a 'match')")
+    parser.add_argument("--iou_min", type=float, default=0.5,
+                        help="Initial minimum IoU (overlap) (what constitutes a 'match')")
+    parser.add_argument("--iou_max", type=float, default=0.95,
+                        help="Initial maximum IoU (overlap) (what constitutes a 'match')")
     args = parser.parse_args()
     if args.images_path[-1] != '/':
         args.images_path += '/'

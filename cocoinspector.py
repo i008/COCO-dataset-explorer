@@ -24,19 +24,24 @@ class Capturing(list):
 
 class CoCoInspector():
 
-    def __init__(self, coco_gt, coco_det=None, base_path=None, iou='bbox', *args, **kwargs):
+    def __init__(self, coco_gt, coco_det=None, base_path=None, iou_type='bbox', iou_min=0.5, iou_max=0.95, *args, **kwargs):
         self.coco_gt = coco_gt
         self.coco_dt = coco_det
         self.cocoeval = None
-        self.iou = 'bbox'
+        self.iouType = iou_type
         self.base_path = base_path
         self.cat2id = dict([(v['name'], v['id']) for v in self.coco_dt.cats.values()])
 
+        self.iouMin = iou_min
+        self.iouMax = iou_max
         self.threshold = 0.3  # default per image scoring threshold
 
     def evaluate(self):
         if self.coco_gt and self.coco_dt:
-            self.cocoeval = COCOeval(self.coco_gt, self.coco_dt, self.iou)
+            self.cocoeval = COCOeval(self.coco_gt, self.coco_dt, self.iouType)
+            self.cocoeval.params.iouThrs = np.linspace(self.iouMin, self.iouMax,
+                                                       int(np.round((self.iouMax - self.iouMin) / .05) + 1),
+                                                       endpoint=True)
             self.cocoeval.evaluate()
             self.cocoeval.accumulate()
             with Capturing() as capture:
