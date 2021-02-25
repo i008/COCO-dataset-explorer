@@ -108,10 +108,16 @@ class CoCoInspector():
         return sorted(categories, key=lambda x: x['id'])
 
     @staticmethod
-    def _get_detections(coco, image_id):
-        annotations = coco.loadAnns(coco.getAnnIds(imgIds=image_id))
+    def _get_detections(coco, image_id, cat_ids=[]):
+        annotations = coco.loadAnns(coco.getAnnIds(imgIds=image_id, catIds=cat_ids))
         return annotations
 
+    def _path2imageid(self, path):
+        if path.startswith(self.base_path):
+            path = path[len(self.base_path):]
+        return next((image_id for image_id, img in self.coco_gt.imgs.items()
+                     if img['file_name'] == path), -1)
+    
     def _imageid2name(self, image_id):
         return self.coco_gt.loadImgs(ids=[image_id])[0]['file_name']
 
@@ -133,18 +139,21 @@ class CoCoInspector():
             dtmatches = []
         return list(set(gtmatches)), list(set(dtmatches))
 
-    def organize_annotations(self, all_annotations, gtmatches):
+    def organize_annotations(self, all_annotations, gtmatches, dtmatches):
         collect = []
         for a in all_annotations:
             a['label'] = self.coco_gt.cats[a['category_id']]['name']
-            if 'score' not in a and a['id']:
-                a['type'] = 'gt'
+            if 'score' not in a:
+                if a['id'] in dtmatches:
+                    a['type'] = 'gt'
+                else:
+                    a['type'] = 'fn'
                 collect.append(a)
                 continue
-            if 'score' in a: a['type'] = 'pred'
-            if a['id'] in gtmatches: a['type'] = 'tp'
-            if a['id'] not in gtmatches: a['type'] = 'fp'
-
+            if a['id'] in gtmatches:
+                a['type'] = 'tp'
+            else:
+                a['type'] = 'fp'
             collect.append(a)
         return collect
 
@@ -153,22 +162,30 @@ class CoCoInspector():
                         score_threshold=0.1,
                         draw_gt_mask=True,
                         draw_pred_mask=True,
-                        fontsize=20,
+                        only_categories=None,
+                        adjust_labels=False,
+                        fontsize=12,
                         figsize=(10, 10),
                         dpi=200,
                         ):
-        annotations = self._get_detections(self.coco_gt, image_id)
+        annotations = self._get_detections(self.coco_gt, image_id,
+                                           cat_ids=[self.cat2id[cat] for cat in only_categories or []])
         if self.coco_dt:
-            dt_annotations = self._get_detections(self.coco_dt, image_id)
+            dt_annotations = self._get_detections(self.coco_dt, image_id,
+                                                  cat_ids=[self.cat2id[cat] for cat in only_categories or []])
             gtmatches, dtmatches = self.get_detection_matches(image_id)
             annotations = annotations + dt_annotations
-            annotations = self.organize_annotations(annotations, gtmatches)
+            annotations = self.organize_annotations(annotations, gtmatches, dtmatches)
 
         image = Image.open(self._imageid2path(image_id))
+        # cannot work with 16/32 bit or float images due to Pillow#3011 Pillow#3159 Pillow#3838
+        assert not image.mode.startswith(('I', 'F')), "image %d has unsupported color mode" % image_i
+        image = image.convert('RGB')
         f = vis_image(image, annotations,
                       show_only=show_only,
                       score_threshold=score_threshold,
                       draw_gt_mask=draw_gt_mask,
+                      adjust_labels=adjust_labels,
                       coco=self.coco_gt,
                       axis_off=False,
                       figsize=figsize,
@@ -179,6 +196,8 @@ class CoCoInspector():
         # plt.show()
         plt.draw()
         fn = 'tmpfile.png'
-        fig1.savefig(fn, dpi=dpi)
+        # savefig + st.image can be faster than st.pyplot,
+        # but only when using small dpi/resolution
+        #fig1.savefig(fn, dpi=dpi)
 
         return f, fn

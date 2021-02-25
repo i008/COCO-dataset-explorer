@@ -1,8 +1,12 @@
 albumentations
-opencv_python
+opencv-python-headless
 plotly
 numpy
 pandas
-streamlit==0.57.0
+streamlit>=0.57.0
 matplotlib
 Pillow
+easyimages
+pycocotools
+torchvision
+adjustText

@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas as pd
 import plotly.express as px
@@ -19,6 +20,7 @@ def get_inspector(coco_train, coco_predictions, images_path):
 
 
 def app(args):
+    st.set_page_config(layout='wide')
     st.title('COCO Explorer')
     topbox = st.sidebar.selectbox("Choose what to do ", ['inspect predictions visually',
                                                          'inspect image statistics',
@@ -32,14 +34,16 @@ def app(args):
 
         vis_options = {'true positives': 'tp',
                        'ground truth': 'gt',
+                       'false negatives': 'fn',
                        'false positives': 'fp',
                        }
 
         st.sidebar.text("""
         What to show on image
-        TP - boxes matched with GT (orange)
-        FP - boxes that did not match with GT (teal)
-        GT - ground truth annotations (green)
+        TP - results matching GT (orange)
+        FP - results not matching GT (teal)
+        FN - GT not matching results (red)
+        GT - all ground truth (green)
         """)
         ms = st.sidebar.multiselect("",
                                     list(vis_options.keys()),
@@ -47,31 +51,47 @@ def app(args):
                                     )
 
         st.sidebar.subheader('Visual settings')
+        size = st.sidebar.slider('plot resolution', min_value=1, max_value=50, value=15)
         score = st.sidebar.slider('score threshold', min_value=0.0, max_value=1.0, value=0.5)
 
         draw_pred_mask = st.sidebar.checkbox("Draw predictions masks (red)")
         draw_gt_mask = st.sidebar.checkbox("Draw ground truth masks (green)")
+        adjust_labels = st.sidebar.checkbox("Optimize label placement")
 
         r = st.sidebar.radio('Inspect by', options=['image_id', 'category', 'precision'])
 
         if r == 'image_id':
-            r = st.slider('slider trough all images', min_value=0, max_value=len(inspector.image_ids))
-            st.text(inspector._imageid2path(inspector.image_ids[r]))
+            path = st.text_input('select image by path:',)
+            if path:
+                r = inspector._path2imageid(path)
+                if r < 0:
+                    st.error('No such image file_name')
+                    r = 0
+                else:
+                    r = inspector.image_ids.index(r)
+            else:
+                r = 0
+            r = st.slider('slider trough all images', value=r, min_value=0, max_value=len(inspector.image_ids))
+            path = inspector._imageid2path(inspector.image_ids[r])
+            st.text(path)
+            print(path)
             f, fn = inspector.visualize_image(inspector.image_ids[r],
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
+                                              adjust_labels=adjust_labels,
                                               score_threshold=score,
-                                              fontsize=33,
+                                              fontsize=size,
                                               show_only=[vis_options[o] for o in ms],
-                                              figsize=(15, 15))
-
-            st.image(fn, use_column_width=True)
+                                              figsize=(size, size))
+            st.pyplot(f[0])
             imscores = inspector.image_scores_agg
-            st.dataframe(imscores.loc[inspector.image_ids[r]])
+            if inspector.image_ids[r] in imscores.index:
+                st.dataframe(imscores.loc[inspector.image_ids[r]])
 
         if r == 'category':
             category = st.sidebar.selectbox(label='select by category',
                                             options=[c['name'] for c in inspector.categories])
+            exclusive = st.sidebar.checkbox(label='Show only this category')
             print(category)
             if category:
                 random_ids = inspector.get_random_images_with_category(category)
@@ -80,10 +100,11 @@ def app(args):
                     f, fn = inspector.visualize_image(id,
                                                       draw_gt_mask=draw_gt_mask,
                                                       draw_pred_mask=draw_pred_mask,
+                                                      only_categories=[category] if exclusive else [],
                                                       score_threshold=score,
                                                       show_only=[vis_options[o] for o in ms],
-                                                      fontsize=30,
-                                                      figsize=(20, 20))
+                                                      fontsize=size,
+                                                      figsize=(size, size))
 
                     st.pyplot(f[0])
 
@@ -102,8 +123,8 @@ def app(args):
                                                   draw_pred_mask=draw_pred_mask,
                                                   score_threshold=score,
                                                   show_only=[vis_options[o] for o in ms],
-                                                  fontsize=30,
-                                                  figsize=(20, 20))
+                                                  fontsize=size,
+                                                  figsize=(size, size))
 
                 st.pyplot(f[0])
 
@@ -147,8 +168,13 @@ def app(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--coco_train", type=str, default=None)
-    parser.add_argument("--coco_predictions", type=str, default=None)
-    parser.add_argument("--images_path", type=str, default=None)
+    parser.add_argument("--coco_train", type=str, required=True, metavar="PATH/TO/COCO.json",
+                        help="COCO dataset to inspect")
+    parser.add_argument("--coco_predictions", type=str, required=True, metavar="PATH/TO/COCO.json",
+                        help="COCO annotations to compare to")
+    parser.add_argument("--images_path", type=str, default=os.getcwd(), metavar="PATH/TO/IMAGES/",
+                        help="Directory path to prepend to file_name paths in COCO")
     args = parser.parse_args()
+    if args.images_path[-1] != '/':
+        args.images_path += '/'
     app(args)
