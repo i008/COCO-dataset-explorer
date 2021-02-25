@@ -465,16 +465,15 @@ class COCOeval:
             else:
                 mean_s = np.mean(s[s > -1])
 
-                # cacluate AP(average precision) for each category
-                num_classes = 80
-                avg_ap = 0.0
+                # calculate AP=1 (average precision) for each category
                 if ap == 1:
                     pcp = {}
                     for i, c in enumerate(sorted(list(self.cocoDt.cats.values()), key=lambda x: x['id'])):
-                        pcp[c['name']] = np.mean(s[:, :, i, :])
+                        s0 = s[:, :, i, :]
+                        pcp[c['name']] = np.mean(s0[s0 > -1])
 
                     self.per_class_precisions.append(pcp)
-                    self.ap_per_class_columns.append(f"ap={ap} iouThr={iouThr or '0.5:0.95'} area={areaRng} maxDets={maxDets}")
+                    self.ap_per_class_columns.append(f"ap={ap} iouThr={iouStr} area={areaRng} maxDets={maxDets}")
 
 
             print(iStr.format(titleStr, typeStr, iouStr, areaRng, maxDets, mean_s))

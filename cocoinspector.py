@@ -71,7 +71,7 @@ class CoCoInspector():
         for r in self.cocoeval.evalImgs:
             if r:
                 ids_above_threshold = set([(a, b)[0] for a, b in zip(r['dtIds'], r['dtScores']) if b > threshold])
-                gtids = set(list(r['gtMatches'][0]))  # 0 means for default IoU match == 0.5
+                gtids = set(list(r['gtMatches'][0]))  # 0 means matches for minimum IoU == 0.5
 
                 TP = ids_above_threshold & gtids
                 FP = ids_above_threshold - gtids
