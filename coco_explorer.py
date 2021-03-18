@@ -2,6 +2,7 @@ import argparse
 import os
 
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import streamlit as st
 from pycocotools.coco import COCO
@@ -96,10 +97,11 @@ def app(args):
             exclusive = st.sidebar.checkbox(label='Show only this category')
             print(category)
             if category:
-                random_ids = inspector.get_random_images_with_category(category)
-                for id in random_ids[:10]:
-                    print(id)
-                    f, fn = inspector.visualize_image(id,
+                image_ids = inspector.get_images_with_category(category)
+                image_ids = np.random.permutation(image_ids)
+                for img in image_ids[:10]:
+                    print(img)
+                    f, fn = inspector.visualize_image(img,
                                                       draw_gt_mask=draw_gt_mask,
                                                       draw_pred_mask=draw_pred_mask,
                                                       adjust_labels=adjust_labels,
@@ -110,6 +112,8 @@ def app(args):
                                                       figsize=(size, size))
 
                     st.pyplot(f[0])
+                if len(image_ids) > 10:
+                    st.button('Sample 10 more images')
 
         if r == 'precision':
             prec_min = st.slider(label='Minimum precision', min_value=0.0, max_value=1.0, value=0.0)
@@ -117,8 +121,10 @@ def app(args):
             agg = inspector.image_scores_agg
             agg = agg[agg.precision.between(prec_min, prec_max)]
 
-            for id in agg.index[:10]:
-                f, fn = inspector.visualize_image(id,
+            image_ids = np.random.permutation(agg.index)
+            for img in image_ids[:10]:
+                print(img)
+                f, fn = inspector.visualize_image(img,
                                                   draw_gt_mask=draw_gt_mask,
                                                   draw_pred_mask=draw_pred_mask,
                                                   adjust_labels=adjust_labels,
@@ -128,6 +134,9 @@ def app(args):
                                                   figsize=(size, size))
 
                 st.pyplot(f[0])
+            if len(image_ids) > 10:
+                st.button('Sample 10 more images')
+
 
     elif topbox == 'inspect image statistics':
         st.plotly_chart(px.histogram(inspector.images_df, x='aspect_ratio', title='aspect ratio distribiution',
