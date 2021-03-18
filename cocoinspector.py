@@ -107,6 +107,13 @@ class CoCoInspector():
         image_ids = [a['image_id'] for a in allanno if a['category_id'] == self.cat2id[category]]
         return image_ids
 
+    def get_images_for_file_name(self, fn):
+        if not callable(fn):
+            fn = lambda x: x == fn
+        image_ids = [image_id for image_id, img in self.coco_gt.imgs.items()
+                     if fn(img['file_name'])]
+        return image_ids
+
     @property
     def categories(self):
         categories = [{'name': v['name'], 'id': v['id']} for v in self.coco_dt.cats.values()]

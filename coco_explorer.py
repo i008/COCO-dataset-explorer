@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 
 import pandas as pd
 import numpy as np
@@ -64,21 +65,30 @@ def app(args):
         r = st.sidebar.radio('Inspect by', options=['image_id', 'category', 'precision'])
 
         if r == 'image_id':
-            path = st.text_input('select image by path:',)
+            path = st.text_input('select image by path or filter by regular expression:',)
+            image_ids = inspector.image_ids
             if path:
                 r = inspector._path2imageid(path)
                 if r < 0:
-                    st.error('No such image file_name')
                     r = 0
+                    try:
+                        pattern = re.compile(path)
+                        image_ids = inspector.get_images_for_file_name(pattern.match)
+                    except Exception:
+                        image_ids = []
+                    if not image_ids:
+                        st.error('No such image file_name')
+                        image_ids = inspector.image_ids
                 else:
-                    r = inspector.image_ids.index(r)
+                    r = image_ids.index(r)
             else:
                 r = 0
-            r = st.slider('slider trough all images', value=r, min_value=0, max_value=len(inspector.image_ids))
-            path = inspector._imageid2path(inspector.image_ids[r])
+            if len(image_ids) > 1:
+                r = st.slider('slider trough all images', value=r, min_value=0, max_value=len(image_ids)-1)
+            path = inspector._imageid2path(image_ids[r])
             st.text(path)
             print(path)
-            f, fn = inspector.visualize_image(inspector.image_ids[r],
+            f, fn = inspector.visualize_image(image_ids[r],
                                               draw_gt_mask=draw_gt_mask,
                                               draw_pred_mask=draw_pred_mask,
                                               adjust_labels=adjust_labels,
@@ -88,8 +98,8 @@ def app(args):
                                               figsize=(size, size))
             st.pyplot(f[0])
             imscores = inspector.image_scores_agg
-            if inspector.image_ids[r] in imscores.index:
-                st.dataframe(imscores.loc[inspector.image_ids[r]])
+            if image_ids[r] in imscores.index:
+                st.dataframe(imscores.loc[image_ids[r]])
 
         if r == 'category':
             category = st.sidebar.selectbox(label='select by category',
