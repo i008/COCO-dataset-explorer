@@ -25,13 +25,15 @@ def get_inspector(coco_train, coco_predictions, images_path, eval_type, iou_min,
 def app(args):
     st.set_page_config(layout='wide')
     st.title('COCO Explorer')
+    ioumin = st.sidebar.slider("Minimum IoU", min_value=0.0, max_value=1.0, value=args.iou_min)
+    ioumax = st.sidebar.slider("Maximum IoU", min_value=0.0, max_value=1.0, value=args.iou_max)
     topbox = st.sidebar.selectbox("Choose what to do ", ['inspect predictions visually',
                                                          'inspect image statistics',
                                                          'inspect annotations',
                                                          'CoCo scores'
                                                          ])
     inspector = get_inspector(args.coco_train, args.coco_predictions, args.images_path,
-                              args.eval_type, args.iou_min, args.iou_max)
+                              args.eval_type, ioumin, ioumax)
     if topbox == 'inspect predictions visually':
 
         st.sidebar.subheader('Inspect predictions')
