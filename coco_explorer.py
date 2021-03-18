@@ -112,13 +112,10 @@ def app(args):
                     st.pyplot(f[0])
 
         if r == 'precision':
-            st.text("""
-            This will select images in the range of 
-            (prec-0.01 to prec+0.01)
-            """)
-            precision = st.slider(label='precision low->high', min_value=0.0, max_value=1.0)
+            prec_min = st.slider(label='Minimum precision', min_value=0.0, max_value=1.0, value=0.0)
+            prec_max = st.slider(label='Maximum precision', min_value=0.0, max_value=1.0, value=0.3)
             agg = inspector.image_scores_agg
-            agg = agg[agg.precision.between(precision - 0.01, precision + 0.01)]
+            agg = agg[agg.precision.between(prec_min, prec_max)]
 
             for id in agg.index[:10]:
                 f, fn = inspector.visualize_image(id,
