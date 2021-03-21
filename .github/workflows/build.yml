@@ -5,7 +5,7 @@ on: push
 
 
 env:
-  IMAGE: "cocoexplorer"
+  IMAGE: "cocoexp"
   IMAGE_NAME: "i008/$IMAGE-${GITHUB_REF##*/}:$GITHUB_SHA"
 
 jobs:
