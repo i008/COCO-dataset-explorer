@@ -1,12 +1,12 @@
 
-name: Build and Deploy to GKE
+name: Build and Push
 
 on: push
 
 
 env:
-  IMAGE: cocoexplorer
-  IMAGE_NAME: "gcr.io/$PROJECT_ID/$IMAGE-${GITHUB_REF##*/}:$GITHUB_SHA"
+  IMAGE: "cocoexplorer"
+  IMAGE_NAME: "i008/$IMAGE-${GITHUB_REF##*/}:$GITHUB_SHA"
 
 jobs:
   setup-build-publish:
@@ -26,9 +26,11 @@ jobs:
       run: |-
         docker build \
           --file Dockerfile \
-          --tag i008/cocoexplorer:latest \
+          --tag i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest \
+          --tag i008/$IMAGE:latest \
         .
 
     - name: Publish
       run: |-
-        docker push i008/cocoexplorer:latest
+        docker push i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest \
+        docker push i008/$IMAGE:latest
