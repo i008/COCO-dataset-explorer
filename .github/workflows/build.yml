@@ -32,5 +32,5 @@ jobs:
 
     - name: Publish
       run: |-
-        docker push i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest \
+        docker push i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest
         docker push i008/$IMAGE:latest
