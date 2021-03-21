@@ -24,19 +24,24 @@ class Capturing(list):
 
 class CoCoInspector():
 
-    def __init__(self, coco_gt, coco_det=None, base_path=None, iou='bbox', *args, **kwargs):
+    def __init__(self, coco_gt, coco_det=None, base_path=None, iou_type='bbox', iou_min=0.5, iou_max=0.95, *args, **kwargs):
         self.coco_gt = coco_gt
         self.coco_dt = coco_det
         self.cocoeval = None
-        self.iou = 'bbox'
+        self.iouType = iou_type
         self.base_path = base_path
         self.cat2id = dict([(v['name'], v['id']) for v in self.coco_dt.cats.values()])
 
+        self.iouMin = iou_min
+        self.iouMax = iou_max
         self.threshold = 0.3  # default per image scoring threshold
 
     def evaluate(self):
         if self.coco_gt and self.coco_dt:
-            self.cocoeval = COCOeval(self.coco_gt, self.coco_dt, self.iou)
+            self.cocoeval = COCOeval(self.coco_gt, self.coco_dt, self.iouType)
+            self.cocoeval.params.iouThrs = np.linspace(self.iouMin, self.iouMax,
+                                                       int(np.round((self.iouMax - self.iouMin) / .05) + 1),
+                                                       endpoint=True)
             self.cocoeval.evaluate()
             self.cocoeval.accumulate()
             with Capturing() as capture:
@@ -66,7 +71,7 @@ class CoCoInspector():
         for r in self.cocoeval.evalImgs:
             if r:
                 ids_above_threshold = set([(a, b)[0] for a, b in zip(r['dtIds'], r['dtScores']) if b > threshold])
-                gtids = set(list(r['gtMatches'][0]))  # 0 means for default IoU match == 0.5
+                gtids = set(list(r['gtMatches'][0]))  # 0 means matches for minimum IoU == 0.5
 
                 TP = ids_above_threshold & gtids
                 FP = ids_above_threshold - gtids
@@ -97,9 +102,16 @@ class CoCoInspector():
     def image_ids(self):
         return list(self.coco_gt.imgs.keys())
 
-    def get_random_images_with_category(self, category):
+    def get_images_with_category(self, category):
         allanno = self.coco_gt.loadAnns(self.coco_gt.getAnnIds())
         image_ids = [a['image_id'] for a in allanno if a['category_id'] == self.cat2id[category]]
+        return image_ids
+
+    def get_images_for_file_name(self, fn):
+        if not callable(fn):
+            fn = lambda x: x == fn
+        image_ids = [image_id for image_id, img in self.coco_gt.imgs.items()
+                     if fn(img['file_name'])]
         return image_ids
 
     @property
