@@ -25,13 +25,13 @@ jobs:
       run: |-
         docker build \
           --file Dockerfile \
-          --tag i008/$IMAGE:${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER \
+          --tag i008/$IMAGE:$GITHUB_SHA \
           --tag i008/$IMAGE:latest \
         .
 
     - name: Publish
       run: |-
-        docker push i008/$IMAGE:${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER
+        docker push i008/$IMAGE:$GITHUB_SHA
 
     - name: PublishLatest
       if: github.ref  == 'refs/heads/master'
