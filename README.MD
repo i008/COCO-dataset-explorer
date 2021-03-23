@@ -16,7 +16,7 @@ https://drive.google.com/open?id=1wxIagenNdCt_qphEe8gZYK7H2_to9QXl
 2. Setup using docker
 
 ```sh
-sudo docker run -p 8501:8501 -it -v "$PWD"/coco_data:/coco_data i008/coco_explorer  \
+sudo docker run -p 8501:8501 -it -v "$PWD"/coco_data:/coco_data i008/cocoexp:latest  \
     --coco_train /coco_data/ground_truth_annotations.json \
     --coco_predictions /coco_data/predictions.json  \
     --images_path /coco_data/images/
