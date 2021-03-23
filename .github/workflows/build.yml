@@ -1,12 +1,11 @@
 
 name: Build and Push
 
-on: push
+on: [push, pull_request]
 
 
 env:
   IMAGE: "cocoexp"
-  IMAGE_NAME: "i008/$IMAGE-${GITHUB_REF##*/}:$GITHUB_SHA"
 
 jobs:
   setup-build-publish:
@@ -26,11 +25,21 @@ jobs:
       run: |-
         docker build \
           --file Dockerfile \
-          --tag i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest \
+          --tag i008/$IMAGE:${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER \
           --tag i008/$IMAGE:latest \
         .
 
     - name: Publish
       run: |-
-        docker push i008/$IMAGE-${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER:latest
+        docker push i008/$IMAGE:${GITHUB_REF##*/}-$GITHUB_RUN_NUMBER
+
+    - name: PublishLatest
+      if: github.ref  == 'refs/heads/master'
+      run: |-
         docker push i008/$IMAGE:latest
+
+
+
+
+
+
