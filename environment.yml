@@ -1,7 +1,5 @@
 name: cocoexplorer
 dependencies:
-  - cython
-  - numpy==1.16.2
   - pip
   - pip:
       - albumentations==0.4.5
