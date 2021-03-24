@@ -8,7 +8,10 @@ on:
     - '**'
   pull_request:
     branches:
-      - '*'
+      - '**'
+env:
+  IMAGE: "cocoexp"
+
 jobs:
   build:
     name: Setup, Build, Publish
