@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import re
 
@@ -13,9 +14,15 @@ from cocoinspector import CoCoInspector
 
 @st.cache(allow_output_mutation=True)
 def get_inspector(coco_train, coco_predictions, images_path, eval_type, iou_min, iou_max):
-    coco = COCO(coco_train)
-    coco_dt = coco.loadRes(coco_predictions)
-    inspector = CoCoInspector(coco, coco_dt, base_path=images_path,
+    coco_gt = COCO(coco_train)
+    if coco_predictions is None:
+        coco_dt = coco_gt
+    else:
+        coco = json.load(open(coco_predictions))
+        if isinstance(coco, dict) and 'annotations' in coco:
+            coco = coco['annotations']
+        coco_dt = coco.loadRes(coco)
+    inspector = CoCoInspector(coco_gt, coco_dt, base_path=images_path,
                               iou_type=eval_type, iou_min=iou_min, iou_max=iou_max)
     inspector.evaluate()
     inspector.calculate_stats()
@@ -192,7 +199,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--coco_train", type=str, required=True, metavar="PATH/TO/COCO.json",
                         help="COCO dataset to inspect")
-    parser.add_argument("--coco_predictions", type=str, required=True, metavar="PATH/TO/COCO.json",
+    parser.add_argument("--coco_predictions", type=str, default=None, metavar="PATH/TO/COCO.json",
                         help="COCO annotations to compare to")
     parser.add_argument("--images_path", type=str, default=os.getcwd(), metavar="PATH/TO/IMAGES/",
                         help="Directory path to prepend to file_name paths in COCO")
