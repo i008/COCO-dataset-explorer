@@ -30,7 +30,7 @@ jobs:
   publish:
     name: Build Publish
     runs-on: ubuntu-latest
-    if:  ${{ github.repository_owner == 'i008'}}
+    if: ${{ github.event_name != 'pull_request'}}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
