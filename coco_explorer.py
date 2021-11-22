@@ -22,7 +22,7 @@ def get_inspector(coco_train, coco_predictions, images_path, eval_type,
         coco = json.load(open(coco_predictions))
         if isinstance(coco, dict) and 'annotations' in coco:
             coco = coco['annotations']
-        coco_dt = coco.loadRes(coco)
+        coco_dt = coco_gt.loadRes(coco)
     if filter_categories:
         filter_catids = [cat['id'] for cat in coco_gt.dataset['categories']
                          if cat['name'] in filter_categories.split(',')]
