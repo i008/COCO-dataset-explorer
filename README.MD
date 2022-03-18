@@ -1,3 +1,9 @@
+# Dear visitor,
+If you think about using this software - there are better alternatives out there that do the same (and much much more) and are actively maintained.
+I recommend you to check out fiftyone:
+- https://voxel51.com/docs/fiftyone/
+
+
 ### What is this
 
 This tool given a COCO annotations file and COCO predictions file will let you explore your dataset, visualize results
