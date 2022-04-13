@@ -61,7 +61,7 @@ class CoCoInspector():
         all_anns = self.coco_gt.loadAnns(self.coco_gt.getAnnIds())
         dfannot = pd.DataFrame.from_records(all_anns)[['area', 'category_id', 'bbox']]
 
-        dfannot['ann_ar'] = dfannot.bbox.apply(lambda x: x[2] / x[3])
+        dfannot['ann_ar'] = dfannot.bbox.apply(lambda x: x[2] / x[3] if x[2] * x[3] else -1)
         dfannot['category_name'] = dfannot.category_id.apply(lambda x: self.coco_gt.cats[x]['name'])
 
         self.annot_df = dfannot
