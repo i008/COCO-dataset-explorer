@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import re
 
@@ -12,10 +13,28 @@ from cocoinspector import CoCoInspector
 
 
 @st.cache(allow_output_mutation=True)
-def get_inspector(coco_train, coco_predictions, images_path, eval_type, iou_min, iou_max):
-    coco = COCO(coco_train)
-    coco_dt = coco.loadRes(coco_predictions)
-    inspector = CoCoInspector(coco, coco_dt, base_path=images_path,
+def get_inspector(coco_train, coco_predictions, images_path, eval_type,
+                  iou_min, iou_max, filter_categories):
+    coco_gt = COCO(coco_train)
+    if coco_predictions is None:
+        coco_dt = coco_gt
+    else:
+        coco = json.load(open(coco_predictions))
+        if isinstance(coco, dict) and 'annotations' in coco:
+            coco = coco['annotations']
+        coco_dt = coco_gt.loadRes(coco)
+    if filter_categories:
+        filter_catids = [cat['id'] for cat in coco_gt.dataset['categories']
+                         if cat['name'] in filter_categories.split(',')]
+        for ann in coco_gt.anns.values():
+            if ann['category_id'] in filter_catids:
+                coco_gt.dataset['annotations'].remove(ann)
+        coco_gt.createIndex()
+        for ann in coco_dt.anns.values():
+            if ann['category_id'] in filter_catids:
+                coco_dt.dataset['annotations'].remove(ann)
+        coco_dt.createIndex()
+    inspector = CoCoInspector(coco_gt, coco_dt, base_path=images_path,
                               iou_type=eval_type, iou_min=iou_min, iou_max=iou_max)
     inspector.evaluate()
     inspector.calculate_stats()
@@ -33,7 +52,7 @@ def app(args):
                                                          'CoCo scores'
                                                          ])
     inspector = get_inspector(args.coco_train, args.coco_predictions, args.images_path,
-                              args.eval_type, ioumin, ioumax)
+                              args.eval_type, ioumin, ioumax, args.filter_categories)
     if topbox == 'inspect predictions visually':
 
         st.sidebar.subheader('Inspect predictions')
@@ -192,7 +211,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--coco_train", type=str, required=True, metavar="PATH/TO/COCO.json",
                         help="COCO dataset to inspect")
-    parser.add_argument("--coco_predictions", type=str, required=True, metavar="PATH/TO/COCO.json",
+    parser.add_argument("--coco_predictions", type=str, default=None, metavar="PATH/TO/COCO.json",
                         help="COCO annotations to compare to")
     parser.add_argument("--images_path", type=str, default=os.getcwd(), metavar="PATH/TO/IMAGES/",
                         help="Directory path to prepend to file_name paths in COCO")
@@ -202,6 +221,8 @@ if __name__ == '__main__':
                         help="Initial minimum IoU (overlap) (what constitutes a 'match')")
     parser.add_argument("--iou_max", type=float, default=0.95,
                         help="Initial maximum IoU (overlap) (what constitutes a 'match')")
+    parser.add_argument("--filter_categories", type=str, default="", metavar="COMMA-SEPD-LIST",
+                        help="Strip annotations for these categories after loading")
     args = parser.parse_args()
     if args.images_path[-1] != '/':
         args.images_path += '/'

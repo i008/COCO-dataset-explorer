@@ -61,7 +61,7 @@ class CoCoInspector():
         all_anns = self.coco_gt.loadAnns(self.coco_gt.getAnnIds())
         dfannot = pd.DataFrame.from_records(all_anns)[['area', 'category_id', 'bbox']]
 
-        dfannot['ann_ar'] = dfannot.bbox.apply(lambda x: x[2] / x[3])
+        dfannot['ann_ar'] = dfannot.bbox.apply(lambda x: x[2] / x[3] if x[2] * x[3] else -1)
         dfannot['category_name'] = dfannot.category_id.apply(lambda x: self.coco_gt.cats[x]['name'])
 
         self.annot_df = dfannot
@@ -151,21 +151,20 @@ class CoCoInspector():
             dtmatches = []
         return list(set(gtmatches)), list(set(dtmatches))
 
-    def organize_annotations(self, all_annotations, gtmatches, dtmatches):
+    def organize_annotations(self, annotations, gtmatches, dtmatches, is_gt=True):
         collect = []
-        for a in all_annotations:
+        for a in annotations:
             a['label'] = self.coco_gt.cats[a['category_id']]['name']
-            if 'score' not in a:
+            if is_gt:
                 if a['id'] in dtmatches:
                     a['type'] = 'gt'
                 else:
                     a['type'] = 'fn'
-                collect.append(a)
-                continue
-            if a['id'] in gtmatches:
-                a['type'] = 'tp'
             else:
-                a['type'] = 'fp'
+                if a['id'] in gtmatches:
+                    a['type'] = 'tp'
+                else:
+                    a['type'] = 'fp'
             collect.append(a)
         return collect
 
@@ -186,8 +185,8 @@ class CoCoInspector():
             dt_annotations = self._get_detections(self.coco_dt, image_id,
                                                   cat_ids=[self.cat2id[cat] for cat in only_categories or []])
             gtmatches, dtmatches = self.get_detection_matches(image_id)
-            annotations = annotations + dt_annotations
-            annotations = self.organize_annotations(annotations, gtmatches, dtmatches)
+            annotations = (self.organize_annotations(annotations, gtmatches, dtmatches, True) +
+                           self.organize_annotations(dt_annotations, gtmatches, dtmatches, False))
 
         image = Image.open(self._imageid2path(image_id))
         # cannot work with 16/32 bit or float images due to Pillow#3011 Pillow#3159 Pillow#3838
